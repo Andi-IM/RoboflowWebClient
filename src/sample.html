@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Image With Preview Image</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet"
+          href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+</head>
+<body class="bg-blue-400 min-h-screen flex justify-center items-center ">
+
+<div class="max-w-[400px] w-full bg-white rounded-3xl p-[30px]">
+    <input type="file" id="file" name="img" accept="image/*" hidden>
+    <div id="imgArea" class="relative w-full h-[240px] mb-[30px] rounded-2xl overflow-hidden flex justify-center items-center flex-col before:content-[attr(data-img)]"
+         data-img="">
+        <i class='bx bxs-cloud-upload text-[100px]'></i>
+        <h3 class="mb-2 text-md">Upload Image</h3>
+        <p class="text-[#999]">Image size must be less than <span class="font-bold">2MB</span></p>
+    </div>
+    <button id="selectImage" class="block w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">
+        Button
+    </button>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/boxicons@2.1.3/dist/boxicons.js"></script>
+    <script src="https://use.fontawesome.com/fe459689b4.js"></script>
+    <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <style>
+        .canvas-hidden {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+<div class="flex justify-center items-center min-h-screen bg-gradient-to-b from-emerald-500 to-emerald-900">
+    <div class="max-w-[800px] w-full max-h-[800px] h-full p-4 bg-white rounded shadow-lg">
+        <h1 class="text-xl font-semibold mb-4">Roboflow.js</h1>
+        <div class="w-full h-full border border-gray-300 flex flex-col justify-center items-center p-2">
+
+            <div class="my-2 flex justify-center w-full h-full rounded-lg border border-dashed border-gray-900/25 px-6 py-10" data-img="">
+                <div class="text-center">
+                    <box-icon type="solid" name="cloud-upload" size="lg" animation="tada" color="grey"></box-icon>
+                    <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                        <label for="file-upload"
+                               class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                            <span>Upload a file</span>
+                            <input id="file-upload" name="file-upload" type="file" class="sr-only"
+                                   onchange="readURL(this);">
+                        </label>
+                        <p class="pl-1">or drag and drop</p>
+                    </div>
+                    <p class="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+                </div>
+                <img src="#" alt="">
+            </div>
+
+            <button id="startbutton" type="button"
+                    class="text-white  focus:outline-none focus:ring-4 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    onclick="send();">Detect!
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let file = null
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#img')
+                    .removeClass('hidden')
+                    .attr('src', e.target.result);
+
+                const img = new Image();
+                img.onload = () => {
+                    // onload
+                };
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(input.files[0]);
+            console.log(file)
+        }
+    }
+
+    function send() {
+        roboflow.auth({
+            publishable_key: "rf_Rodjcdhbzz6pANY5STvt"
+        }).load({
+            model: "orchid-flower-detection",
+            version: 4 // <--- YOUR VERSION NUMBER
+        }).then(function (model) {
+            // model has loaded!
+            model.detect(file).then((result) => {
+                console.log(result);
+            })
+
+        });
+    }
+</script>
+</body>
+
+</html>
