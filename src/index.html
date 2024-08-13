@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://unpkg.com/boxicons@2.1.3/dist/boxicons.js"></script>
+    <link rel="stylesheet"
+          href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
     <script src="https://use.fontawesome.com/fe459689b4.js"></script>
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -21,75 +22,139 @@
     </style>
 </head>
 
-<body>
-<div class="flex justify-center items-center min-h-screen bg-gradient-to-b from-emerald-500 to-emerald-900">
-    <div class="max-w-[800px] w-full max-h-[800px] h-full p-4 bg-white rounded shadow-lg">
-        <h1 class="text-xl font-semibold mb-4">Roboflow.js</h1>
-        <div class="w-full h-full border border-gray-300 flex flex-col justify-center items-center p-2">
-
-            <div class="my-2 flex justify-center w-full h-full rounded-lg border border-dashed border-gray-900/25 px-6 py-10" data-img="">
-                <div class="text-center">
-                    <box-icon type="solid" name="cloud-upload" size="lg" animation="tada" color="grey"></box-icon>
-                    <div class="mt-4 flex text-sm leading-6 text-gray-600">
-                        <label for="file-upload"
-                               class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                            <span>Upload a file</span>
-                            <input id="file-upload" name="file-upload" type="file" class="sr-only"
-                                   onchange="readURL(this);">
-                        </label>
-                        <p class="pl-1">or drag and drop</p>
-                    </div>
-                    <p class="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+<body class="flex justify-center items-center min-h-screen bg-gradient-to-b from-emerald-500 to-emerald-900">
+<div class="max-w-[400px] w-full p-4 bg-white rounded shadow-lg">
+    <h1 class="text-xl font-semibold">Roboflow.js</h1>
+    <div id="X" class="relative flex flex-col border border-gray-300 items-center p-2">
+        <div id="imgArea"
+             class="relative w-full h-full flex items-center justify-center mb-2 rounded-lg overflow-hidden before:content-[attr(data-img)] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black/50 before:text-white before:font-bold before:text-center before:flex before:flex-col before:pointer-events-none before:opacity-0"
+             data-img="">
+            <label for="file"
+                   class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                    </svg>
+                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
+                            class="font-semibold">Click to upload</span> or drag and drop</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
                 </div>
-                <img src="#" alt="">
-            </div>
-
-            <button id="startbutton" type="button"
-                    class="text-white  focus:outline-none focus:ring-4 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    onclick="send();">Detect!
-            </button>
-
+                <input id="file" type="file" accept="image/*" class="hidden"/>
+            </label>
         </div>
+        <button id="startbutton" type="button"
+                class="text-white focus:outline-none focus:ring-4 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                onclick="send();">Detect!
+        </button>
+        <p id="hello"></p>
     </div>
 </div>
-
 <script>
     let file = null
 
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
+    const inputFile = document.getElementById("file");
 
-            reader.onload = function (e) {
-                $('#img')
-                    .removeClass('hidden')
-                    .attr('src', e.target.result);
+    function handleImageChange() {
+        const image = this.files[0];
 
-                const img = new Image();
-                img.onload = () => {
-                    // onload
-                };
-                img.src = e.target.result;
+        if (image.size < 2000000) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const allImg = imgArea.querySelectorAll('img');
+                allImg.forEach(item => item.remove());
+                const imgUrl = reader.result;
+                const img = document.createElement('img');
+                img.id = "image"
+                img.classList.add("absolute", "top-0", "left-0", "object-cover", "position-center", "z-30")
+                img.src = imgUrl;
+                file = img;
+                imgArea.appendChild(img);
+                imgArea.classList.add('active');
+                imgArea.dataset.img = image.name;
             };
+            reader.readAsDataURL(image);
+        } else {
+            alert("Image size more than 2MB");
 
-            reader.readAsDataURL(input.files[0]);
-            console.log(file)
         }
     }
 
-    function send() {
+    inputFile.addEventListener('change', handleImageChange);
+
+    function roboflowExecutor(resolve, reject) {
         roboflow.auth({
             publishable_key: "rf_Rodjcdhbzz6pANY5STvt"
         }).load({
             model: "orchid-flower-detection",
             version: 4 // <--- YOUR VERSION NUMBER
-        }).then(function (model) {
-            // model has loaded!
-            model.detect(file).then((result) => {
-                console.log(result);
+        }).then((model) => {
+            resolve(model)
+        })
+            .catch((error) => {
+                reject(error)
+            })
+    }
+
+    function getModel() {
+        return new Promise(roboflowExecutor)
+    }
+
+
+    async function send() {
+        console.log(file.src);
+
+        const model = await getModel()
+
+        try {
+            const results = await model.detect(file)
+            console.log(results);
+
+            const imageHolder = document.getElementById("image")
+            const canvas = document.createElement('canvas');
+            canvas.classList.add("absolute", "top-0", "left-0", "z-40")
+            canvas.width = file.width
+            canvas.height = file.height
+
+
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+            const font = "16px sans-serif";
+            ctx.font = font;
+            ctx.textBaseline = "top";
+            results.forEach(result => {
+                // console.log(result)
+                const x = result.bbox.x;
+                const y = result.bbox.y;
+                const width = result.bbox.width;
+                const height = result.bbox.height;
+
+                ctx.strokeStyle = result.color;
+                ctx.lineWidth = 4;
+                ctx.strokeRect(x, y, width, height);
+
+                ctx.fillStyle = result.color;
+                const textWidth = ctx.measureText(result.class).width;
+                const textHeight = parseInt(font, 10);
+                ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
             })
 
-        });
+            results.forEach(result => {
+                const x = result.bbox.x;
+                const y = result.bbox.y;
+                ctx.fillStyle = "#000";
+                ctx.fillText(result.class, x, y);
+            })
+
+            imgArea.appendChild(canvas)
+            // console.log(canvas.toDataURL())
+
+            document.getElementById("hello").innerText = JSON.stringify(results.map(result => result.class))
+        } catch (e) {
+            console.error(e)
+        }
     }
 </script>
 </body>
